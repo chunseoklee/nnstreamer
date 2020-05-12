@@ -20,6 +20,14 @@
  * @author	Jaeyun Jung <jy1210.jung@samsung.com>
  * @bug		No known bugs except for NYI items
  */
+#include <android/log.h>
+#include <sys/time.h>
+long long currentTimeInMicroseconds()
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return ((tv.tv_sec * 1000 * 1000) + (tv.tv_usec));
+}
 
 #include "nnstreamer-native.h"
 
@@ -159,10 +167,13 @@ Java_org_nnsuite_nnstreamer_SingleShot_nativeInvoke (JNIEnv * env,
     goto done;
   }
 
+  long long curtime = currentTimeInMicroseconds();
   if (!nns_parse_tensors_data (pipe_info, env, in, &in_data, &in_info)) {
     nns_loge ("Failed to parse input tensors data.");
     goto done;
   }
+  long long elapsed = currentTimeInMicroseconds()-curtime;
+  __android_log_print(ANDROID_LOG_INFO,"nativeInvoke", "time for parse_tensor_data: %lld", elapsed);
 
   if (in_info == NULL || ml_tensors_info_is_equal (cur_info, in_info)) {
     /* input tensors info is not changed */
@@ -171,7 +182,11 @@ Java_org_nnsuite_nnstreamer_SingleShot_nativeInvoke (JNIEnv * env,
       goto done;
     }
 
+    curtime = currentTimeInMicroseconds();
     status = ml_single_invoke (single, in_data, &out_data);
+    elapsed = currentTimeInMicroseconds()-curtime;
+    __android_log_print(ANDROID_LOG_INFO,"nativeInvoke", "time for ml_single_invoke: %lld", elapsed);
+
   } else {
     /* input tensors info changed, call dynamic */
     status =
@@ -184,10 +199,14 @@ Java_org_nnsuite_nnstreamer_SingleShot_nativeInvoke (JNIEnv * env,
     goto done;
   }
 
+  curtime = currentTimeInMicroseconds();
   if (!nns_convert_tensors_data (pipe_info, env, out_data, out_info, &result)) {
     nns_loge ("Failed to convert the result to data.");
     result = NULL;
   }
+  elapsed = currentTimeInMicroseconds()-curtime;
+  __android_log_print(ANDROID_LOG_INFO,"nativeInvoke", "time for convert_tensor_data: %lld", elapsed);
+
 
 done:
   ml_tensors_data_destroy (in_data);
