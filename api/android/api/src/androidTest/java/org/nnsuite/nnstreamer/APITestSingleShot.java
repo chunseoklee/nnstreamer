@@ -63,6 +63,47 @@ public class APITestSingleShot {
         }
     }
 
+    @Test
+    public void testNNFWNLUDynamic() {
+        /* Be carefull, this test requires backend-bcq and should be run without tensorflow-lite. */
+        if (!NNStreamer.isAvailable(NNStreamer.NNFWType.NNFW)) {
+            /* cannot run the test */
+            return;
+        }
+
+        String root = Environment.getExternalStorageDirectory().getAbsolutePath();
+        File model = new File(root + "/nnstreamer/ONE_nlu_model/dynamic/sra_enlu_notfixed.q3.circle");
+
+        try {
+            SingleShot single = new SingleShot(model, NNStreamer.NNFWType.NNFW);
+            TensorsInfo inInfo = single.getInputInfo();
+            TensorsInfo outInfo = single.getOutputInfo();
+            final int tokenLen = 64;
+
+            printTensorsInfo(inInfo, true);
+            printTensorsInfo(outInfo, false);
+
+            Log.d("nnstreamer-test", "Try to set input dim");
+            inInfo.setTensorDimension(0, new int[]{tokenLen,1});
+            inInfo.setTensorDimension(1, new int[]{1});
+            inInfo.setTensorDimension(2, new int[]{tokenLen,1});
+            inInfo.setTensorDimension(3, new int[]{tokenLen,1});
+            inInfo.setTensorDimension(4, new int[]{882,tokenLen,1});
+
+            single.setInputInfo(inInfo);
+
+            TensorsInfo inResult = single.getInputInfo();
+            TensorsInfo outResult = single.getOutputInfo();
+
+            printTensorsInfo(inResult, true);
+            printTensorsInfo(outResult, false);
+
+            single.close();
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
     private void printTensorsInfo(TensorsInfo info, boolean isInput) {
         int num = info.getTensorsCount();
 
