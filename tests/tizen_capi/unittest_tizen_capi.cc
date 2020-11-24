@@ -4530,7 +4530,7 @@ TEST (nnstreamer_capi_singleshot, set_input_info_success)
   ASSERT_TRUE (g_file_test (test_model, G_FILE_TEST_EXISTS));
 
   status = ml_single_open (&single, test_model, NULL, NULL,
-      ML_NNFW_TYPE_TENSORFLOW_LITE, ML_NNFW_HW_ANY);
+      ML_NNFW_TYPE_NNFW, ML_NNFW_HW_ANY);
   if (is_enabled_tensorflow_lite) {
     ASSERT_EQ (status, ML_ERROR_NONE);
   } else {

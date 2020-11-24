@@ -2,6 +2,6 @@
   "major-version" : "1",
   "minor-version" : "0",
   "patch-version" : "0",
-  "models"      : [ "add.tflite" ],
+  "models"      : [ "mobilenet_v1_1.0_224_quant.tflite" ],
   "model-types" : [ "tflite" ]
 }
