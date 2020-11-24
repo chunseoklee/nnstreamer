@@ -36,16 +36,6 @@ if caffe2_support_is_available
   extensions += [['caffe2', 'caffe2', nnstreamer_filter_caffe2_deps, 'caffe2_init_net.pb,caffe2_predict_net.pb', 'caffe2']]
 endif
 
-if have_python2
-  extensions += [['python2', 'python2', nnstreamer_filter_python2_deps, 'passthrough.py', 'python2-get']]
-  extensions += [['python2', 'python2', nnstreamer_filter_python2_deps, 'scaler.py', 'python2-set']]
-endif
-
-if have_python3
-  extensions += [['python3', 'python3', nnstreamer_filter_python3_deps, 'passthrough.py', 'python3-get']]
-  extensions += [['python3', 'python3', nnstreamer_filter_python3_deps, 'scaler.py', 'python3-set']]
-endif
-
 sed_command = find_program('sed', required: true)
 ext_test_template_prefix = 'unittest_tizen_'
 ext_test_template = files (ext_test_template_prefix + 'template.cc.in')
